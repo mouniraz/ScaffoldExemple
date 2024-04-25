@@ -1,26 +1,43 @@
-package com.example.myapplication
+package com.example.scaffold
 
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
-import androidx.compose.foundation.Image
-import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.*
-import androidx.compose.material.icons.materialIcon
+import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.Menu
+import androidx.compose.material3.Divider
+import androidx.compose.material3.DrawerState
+import androidx.compose.material3.DrawerValue
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.FabPosition
+import androidx.compose.material3.FloatingActionButton
+import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.ModalDrawerSheet
+import androidx.compose.material3.ModalNavigationDrawer
+import androidx.compose.material3.NavigationDrawerItem
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Surface
+import androidx.compose.material3.Text
+import androidx.compose.material3.TopAppBar
+import androidx.compose.material3.TopAppBarDefaults.topAppBarColors
+import androidx.compose.material3.rememberDrawerState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.example.scaffold.ui.theme.ScaffoldTheme
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 
@@ -28,95 +45,92 @@ class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
-            Surface(color = Color.White) {
-                // Scaffold we created
-                LayoutDesign()
+            ScaffoldTheme {
+                // A surface container using the 'background' color from the theme
+                Surface(
+                    modifier = Modifier.fillMaxSize(),
+                    color = MaterialTheme.colorScheme.background
+                ) {
+
+                    LayoutDesign()
+                }
             }
         }
     }
 }
 
-@Composable
-fun Drawer() {
-    // Column Composable
-    Column(
-        Modifier
-            .background(Color.White)
-            .fillMaxSize()
-    ) {
-        // Repeat is a loop which
-        // takes count as argument
-        repeat(5) { item ->
-            Text(text = "Item number $item", modifier = Modifier.padding(8.dp), color = Color.Black)
-        }
-    }
-}
-@Composable
 
-fun LayoutDesign(){
-    val coroutinescope= rememberCoroutineScope()
-    val scaffoldState =
-        rememberScaffoldState(
-            rememberDrawerState(initialValue = DrawerValue.Closed)
-        )
-    Scaffold (
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun LayoutDesign() {
+val drawerState= rememberDrawerState(initialValue = DrawerValue.Closed)
+val scope= rememberCoroutineScope()
+    ModalNavigationDrawer(
+        drawerState =drawerState ,
+        drawerContent = { ModalDrawerSheet {
+            Text("First Drwer")
+            Divider()
+            Spacer(modifier= Modifier.height(10.dp))
+            NavigationDrawerItem(label = { Text("Login") }, selected = true, onClick = { /*TODO*/ })
 
-        scaffoldState =scaffoldState,
-        topBar =
+        }})
     {
-        TopAppBar(
-        title = {
-            Text(text = "LayoutsCodelab")
 
-        },
-            navigationIcon ={  Icon(
-                imageVector = Icons.Default.Menu,
-                contentDescription = "Menu",
+       Scaffold(
+            topBar = {
+                TopAppBar(
+                    colors = topAppBarColors(
+                        containerColor = MaterialTheme.colorScheme.primaryContainer,
+                        titleContentColor = MaterialTheme.colorScheme.primary,
+                    ),
 
-                // When clicked trigger onClick
-                // Callback to trigger drawer open
-                modifier = Modifier.clickable(onClick = {coroutinescope.launch { scaffoldState.drawerState.open() }}),
-                tint = Color.White
-            )}
-    )
-    },
-        bottomBar = {
+                    title = { Text("First Scaffold") },
+                    navigationIcon = {
+                        Icon(
+                            imageVector = Icons.Default.Menu,
+                            tint = Color.Black,
+                            contentDescription = "Menu",
+                            modifier = Modifier.clickable { scope.launch {
+                                drawerState.apply {
+                                if (isClosed) open()
+                            }}}
 
+                            )
+                    })
+            },
+            bottomBar = {},
+            floatingActionButtonPosition = FabPosition.Center,
+            floatingActionButton = {
+                FloatingActionButton(onClick = { /*TODO*/ }) {
+                    Icon(imageVector = Icons.Default.Add, contentDescription = "")
 
-
-        },
-        drawerContent = {Drawer()},
-        floatingActionButton = {
-            FloatingActionButton(onClick = {  coroutinescope.launch {
-                when (
-                    scaffoldState.snackbarHostState.showSnackbar(
-                    // Message In the snackbar
-                    message = "Snack Bar",
-                    actionLabel = "Dismiss"
-                )) {}
-
-            } }) {
-                Icon(
-                    imageVector = Icons.Default.Add,
-                    contentDescription = "add",
-
-                    // When clicked trigger onClick
-                    // Callback to trigger drawer open
-                    tint = Color.White
-                )
+                }
             }
-        }
-    )
-        { innerPadding->
-        BodyContent(Modifier.padding(innerPadding))
-    }
 
+
+        ) { innerPadding ->
+            Greeting(name = "hhhhhhhhh", modifier = Modifier.padding(innerPadding))
+        }
     }
+}
+
+
+
+
+
 
 @Composable
-fun BodyContent(modifier: Modifier = Modifier) {
-    Column(modifier = modifier.padding((8.dp))) {
-        Text(text = "Hi there!")
-        Text(text = "Thanks for going through the Layouts codelab")
+fun Greeting(name: String, modifier: Modifier = Modifier) {
+    Text(
+        text = "Hello $name!",
+        modifier = modifier
+    )
+}
+
+@Preview(showBackground = true)
+@Composable
+fun GreetingPreview() {
+    ScaffoldTheme {
+        Greeting("Android")
     }
 }
